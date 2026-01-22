@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editando: <%= arquivo.nome_original %></title>
+    <style>
+        body { margin: 0; font-family: monospace; display: flex; flex-direction: column; height: 100vh; }
+        header { background: #2c3e50; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        textarea { flex: 1; background: #222; color: #0f0; border: none; padding: 20px; font-size: 14px; outline: none; resize: none; }
+        button { background: #27ae60; color: white; border: none; padding: 10px 20px; cursor: pointer; font-size: 16px; }
+        a { color: #bdc3c7; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <form action="/projetos/arquivo/save" method="POST" style="display: flex; flex-direction: column; height: 100%;">
+        <header>
+            <div>
+                <span>Editando: <strong><%= arquivo.nome_original %></strong></span>
+            </div>
+            <div>
+                <a href="/projetos/ver/<%= arquivo.projeto_id %>">Cancelar</a>
+                <button type="submit" style="margin-left: 15px;">💾 Salvar Alterações</button>
+            </div>
+        </header>
+        <input type="hidden" name="id" value="<%= arquivo.id %>">
+        <textarea name="conteudo"><%= conteudo %></textarea>
+    </form>
+</body>
+</html>

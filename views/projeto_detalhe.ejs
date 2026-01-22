@@ -1,0 +1,158 @@
+<%- include('partials/header') %>
+
+<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; margin-bottom: 20px;">
+    <div>
+        <h1 style="margin:0;"><%= projeto.nome %></h1>
+        <small style="color: #7f8c8d;">Cliente: <%= projeto.empresa %></small>
+    </div>
+    <div>
+        <span style="padding: 5px 15px; background: #eee; border-radius: 20px; font-weight: bold; color: #333;">
+            Status: <%= projeto.status %>
+        </span>
+        <a href="/projetos" style="margin-left: 15px; color: #7f8c8d; text-decoration: none;">← Voltar</a>
+    </div>
+</div>
+
+<% if (user.tipo_acesso === 'admin') { %>
+    <div style="background: #fff; padding: 15px; border-radius: 5px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <form action="/projetos/status/<%= projeto.id %>" method="POST" style="display: flex; align-items: center; gap: 10px;">
+            <label>Alterar Status:</label>
+            <select name="status" style="padding: 5px;">
+                <option value="Em Andamento" <%= projeto.status=='Em Andamento'?'selected':''%>>Em Andamento</option>
+                <option value="Pendente" <%= projeto.status=='Pendente'?'selected':''%>>Pendente</option>
+                <option value="Concluído" <%= projeto.status=='Concluído'?'selected':''%>>Concluído</option>
+                <option value="Cancelado" <%= projeto.status=='Cancelado'?'selected':''%>>Cancelado</option>
+            </select>
+            <button type="submit" style="padding: 5px 15px;">Salvar</button>
+        </form>
+    </div>
+<% } %>
+
+<div class="card" style="margin-bottom: 30px; border-left: 5px solid #9b59b6;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2 style="margin:0;">📂 Repositório de Arquivos</h2>
+        
+        <a href="/projetos/download-all/<%= projeto.id %>" style="background-color: #34495e; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            📥 Baixar Tudo (.zip)
+        </a>
+    </div>
+    
+    <form action="/projetos/upload" method="POST" enctype="multipart/form-data" style="background: #f9f9f9; padding: 15px; border: 1px dashed #ccc; display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+        <input type="hidden" name="projeto_id" value="<%= projeto.id %>">
+        <input type="hidden" name="projeto_nome" value="<%= projeto.nome %>">
+        
+        <input type="file" name="arquivo" multiple required>
+        <button type="submit" style="background: #9b59b6; border: none; color: white; padding: 5px 15px; cursor: pointer;">⬆ Fazer Upload</button>
+    </form>
+
+    <table style="width: 100%;">
+        <thead>
+            <tr style="background: #eee;">
+                <th style="padding: 10px;">Arquivo</th>
+                <th style="padding: 10px;">Enviado por</th>
+                <th style="padding: 10px;">Data</th>
+                <th style="padding: 10px;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(arquivos.length > 0) { %>
+                <% arquivos.forEach(arq => { %>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px;">📄 <%= arq.nome_original %></td>
+                        <td style="padding: 10px; font-size: 12px;"><%= arq.uploader %></td>
+                        <td style="padding: 10px; font-size: 12px; color: #777;"><%= new Date(arq.data_upload).toLocaleString() %></td>
+                        <td style="padding: 10px;">
+                            <a href="/projetos/arquivo/download/<%= arq.id %>" style="color: #2980b9; text-decoration: none; margin-right: 10px;">⬇ Baixar</a>
+
+                            <% if (arq.nome_original.match(/\.(txt|js|html|css|json|md|ejs)$/)) { %>
+                                <a href="/projetos/arquivo/edit/<%= arq.id %>" style="color: #27ae60; text-decoration: none; margin-right: 10px;">✎ Editar</a>
+                            <% } %>
+
+                            <% if(user.tipo_acesso === 'admin') { %>
+                                <a href="/projetos/arquivo/delete/<%= arq.id %>" style="color: #c0392b; text-decoration: none;" onclick="return confirm('Excluir arquivo permanentemente?')">✖</a>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr><td colspan="4" style="text-align:center; color:#999; padding: 20px;">Nenhum arquivo no repositório.</td></tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<div style="display: flex; gap: 20px;">
+    
+    <div style="flex: 2;">
+        <h2>👥 Equipe do Projeto</h2>
+        
+        <% if (user.tipo_acesso === 'admin') { %>
+            <form action="/projetos/equipe/add" method="POST" style="background: #eee; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+                <input type="hidden" name="projeto_id" value="<%= projeto.id %>">
+                <select name="usuario_id" required style="padding: 5px;">
+                    <option value="">+ Add Profissional</option>
+                    <% todosUsuarios.forEach(u => { %>
+                        <option value="<%= u.id %>"><%= u.nome %></option>
+                    <% }) %>
+                </select>
+                <input type="text" name="funcao" placeholder="Função" required style="padding: 5px; width: 120px;">
+                <button type="submit" style="cursor: pointer;">Adicionar</button>
+            </form>
+        <% } %>
+
+        <table style="width: 100%;">
+            <thead>
+                <tr style="background: #eee;">
+                    <th style="padding: 10px;">Nome</th>
+                    <th style="padding: 10px;">Função</th>
+                    <th style="padding: 10px;">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% equipe.forEach(m => { %>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px;"><%= m.nome %></td>
+                        <td style="padding: 10px;">
+                            <%= m.funcao_no_projeto %>
+                            <% if (user.tipo_acesso === 'admin') { %>
+                                <details style="display: inline-block; margin-left: 5px;">
+                                    <summary style="font-size: 10px; color: blue; cursor:pointer">Editar</summary>
+                                    <div style="position: absolute; background: white; border: 1px solid #ccc; padding: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                        <form action="/projetos/equipe/edit/<%= m.id %>" method="POST">
+                                            <input type="hidden" name="projeto_id" value="<%= projeto.id %>">
+                                            <input type="text" name="nova_funcao" value="<%= m.funcao_no_projeto %>" size="15">
+                                            <button style="cursor: pointer;">OK</button>
+                                        </form>
+                                    </div>
+                                </details>
+                            <% } %>
+                        </td>
+                        <td style="padding: 10px;">
+                            <% if (user.tipo_acesso === 'admin') { %>
+                                <a href="/projetos/equipe/remove/<%= m.id %>/<%= projeto.id %>" style="color: red; text-decoration: none;">✖</a>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="flex: 1; background: #34495e; color: #ecf0f1; padding: 15px; border-radius: 5px; height: fit-content;">
+        <h3 style="margin-top: 0; color: #f1c40f;">⚡ Logs de Atividade</h3>
+        <div style="font-size: 11px; max-height: 400px; overflow-y: auto;">
+            <% logs.forEach(log => { %>
+                <div style="margin-bottom: 10px; border-bottom: 1px solid #465f75; padding-bottom: 5px;">
+                    <strong style="color: #3498db;"><%= log.usuario %></strong> 
+                    <span style="color: #bdc3c7;">[<%= log.acao %>]</span><br>
+                    <%= log.detalhe %><br>
+                    <i style="color: #7f8c8d;"><%= new Date(log.data_hora).toLocaleString() %></i>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+</div>
+
+<%- include('partials/footer') %>

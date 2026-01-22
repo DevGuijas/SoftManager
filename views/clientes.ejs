@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+
+    <h1>Gestão de Clientes</h1>
+
+    <% if (typeof erro !== 'undefined' && erro) { %>
+        <div style="background: #e74c3c; color: white; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+            ⚠️ <%= erro %>
+        </div>
+    <% } %>
+
+    <% if (user.tipo_acesso === 'admin') { %>
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h3>Novo Cliente</h3>
+            <form action="/clientes/add" method="POST">
+                <div class="form-group">
+                    <input type="text" name="nome" placeholder="Nome do Contato" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="empresa" placeholder="Nome da Empresa" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="E-mail Corporativo" required>
+                </div>
+                <button type="submit">+ Cadastrar Cliente</button>
+            </form>
+        </div>
+    <% } %>
+
+    <h2>Lista de Clientes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Empresa</th>
+                <th>Contato</th>
+                <th>E-mail</th>
+                <% if (user.cargo === 'CEO') { %> <th>Ações</th> <% } %>
+            </tr>
+        </thead>
+        <tbody>
+            <% clientes.forEach(function(c) { %>
+                <tr>
+                    <td><%= c.id %></td>
+                    <td><strong><%= c.empresa %></strong></td>
+                    <td><%= c.nome %></td>
+                    <td><%= c.email %></td>
+                    
+                    <% if (user.cargo === 'CEO') { %>
+                        <td>
+                            <a href="/clientes/delete/<%= c.id %>" class="btn-danger" onclick="return confirm('Tem certeza? Isso é irreversível.')">Excluir</a>
+                        </td>
+                    <% } %>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+<%- include('partials/footer') %>

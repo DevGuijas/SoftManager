@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - SoftManager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body { justify-content: center; align-items: center; background: #2c3e50; }
+        .login-box { background: white; padding: 40px; border-radius: 8px; width: 300px; text-align: center; }
+        input { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>SoftManager</h2>
+        <% if (erro) { %>
+            <p style="color: red"><%= erro %></p>
+        <% } %>
+        <form action="/login" method="POST">
+            <input type="email" name="email" placeholder="E-mail" required value="">
+            <input type="password" name="senha" placeholder="Senha" required value="">
+            <button type="submit" style="width:100%">Entrar</button>
+        </form>
+        <p style="font-size: 12px; color: #666; margin-top: 10px;">
+            Dica: <b>SeuUsuário@soft.com</b> / <b>SuaSenha</b>
+        </p>
+    </div>
+</body>
+</html>

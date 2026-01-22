@@ -1,0 +1,105 @@
+<%- include('partials/header') %>
+
+    <h1>Gestão de Projetos</h1>
+
+    <% if (user.tipo_acesso === 'admin') { %>
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h3>Novo Projeto</h3>
+            <form action="/projetos/add" method="POST">
+                
+                <div class="form-group">
+                    <label>Nome do Projeto / Sprint:</label>
+                    <input type="text" name="nome" placeholder="Ex: E-commerce V2, App Delivery..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Cliente (Empresa):</label>
+                    <select name="cliente_id" style="width: 100%; padding: 10px;" required>
+                        <option value="" disabled selected>Selecione um cliente...</option>
+                        <% if(clientes.length > 0) { %>
+                            <% clientes.forEach(function(c) { %>
+                                <option value="<%= c.id %>"><%= c.empresa %> (Contato: <%= c.nome %>)</option>
+                            <% }); %>
+                        <% } else { %>
+                            <option value="" disabled>Nenhum cliente cadastrado</option>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Status Inicial:</label>
+                    <select name="status" style="width: 100%; padding: 10px;">
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Pendente">Pendente / Backlog</option>
+                    </select>
+                </div>
+
+                <button type="submit" style="background-color: #3498db;">+ Criar Projeto</button>
+            </form>
+        </div>
+    <% } %>
+
+    <h2>Projetos Cadastrados</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Projeto</th>
+                <th>Cliente</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if(projetos.length > 0) { %>
+                <% projetos.forEach(function(p) { %>
+                    <tr>
+                        <td><%= p.id %></td>
+                        <td><strong><%= p.nome %></strong></td>
+                        <td>
+                            <% if(p.empresa) { %>
+                                <%= p.empresa %>
+                            <% } else { %>
+                                <span style="color:red; font-size: 12px;">(Cliente Removido)</span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% let color = 'black'; %>
+                            <% if(p.status == 'Concluído') color = 'green'; %>
+                            <% if(p.status == 'Em Andamento') color = 'blue'; %>
+                            <% if(p.status == 'Cancelado') color = 'red'; %>
+                            <% if(p.status == 'Pendente') color = 'orange'; %>
+                            
+                            <span style="font-weight: bold; color: <%= color %>;">
+                                <%= p.status %>
+                            </span>
+                        </td>
+                        <td>
+                            <% 
+                                // Verifica se é Admin OU se o ID do projeto está na lista de projetos do usuário
+                                const temAcesso = user.tipo_acesso === 'admin' || meusProjetosIds.includes(p.id);
+                            %>
+
+                            <% if (temAcesso) { %>
+                                <a href="/projetos/ver/<%= p.id %>" style="background-color: #f39c12; color: white; padding: 5px 10px; border-radius: 4px; text-decoration: none; font-size: 14px;">
+                                    <%= user.tipo_acesso === 'admin' ? 'Gerenciar' : 'Visualizar' %>
+                                </a>
+                            <% } else { %>
+                                <span style="font-size: 12px; color: #ccc;">🔒 Restrito</span>
+                            <% } %>
+
+                            <% if (user.tipo_acesso === 'admin') { %>
+                                <a href="/projetos/delete/<%= p.id %>" class="btn-danger" style="margin-left: 10px;" onclick="return confirm('Apagar este projeto?')">Excluir</a>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="5" style="text-align:center; color: #777;">Nenhum projeto registrado.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+<%- include('partials/footer') %>
