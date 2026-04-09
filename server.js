@@ -8,7 +8,8 @@ const AdmZip = require('adm-zip'); // BIBLIOTECA PARA ZIPAR
 const db = require('./database');
 
 const app = express();
-const PORT = 3000;
+/*const PORT = 3000;*/
+const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -380,4 +381,5 @@ app.post('/projetos/arquivo/save', checkAuth, (req, res) => {
     });
 });
 
-app.listen(PORT, () => console.log(`SoftManager rodando em http://localhost:${PORT}`));
+/*app.listen(PORT, () => console.log(`SoftManager rodando em http://localhost:${PORT}`));*/
+app.listen(PORT, () => console.log(`Rodando na porta ${PORT}`));
